@@ -109,13 +109,23 @@ namespace SpaceWarGame
             }
         }
 
+        private void PlayAgain()
+        {
+            if(Application.OpenForms[0] == this)
+            {
+                Application.Restart();
+            }
+        }
+
         int enemyCounter = 0;
         int starCounter = 0;
+        int score = 0;
+        int life = 3;
         private void timer1_Tick(object sender, EventArgs e)
         {
             enemyCounter++;
             starCounter++;
-
+            Lifelbl.Text = life.ToString();
             for(int i = 0; i < panel1.Controls.Count; i++)
             {
                 PictureBox pb = ((PictureBox)panel1.Controls[i]);
@@ -139,6 +149,22 @@ namespace SpaceWarGame
                     else
                     {
                         pb.Location = new Point(pb.Location.X - 5, pb.Location.Y);
+                        if(pb.Location.X > Shippic.Location.X && pb.Location.X < Shippic.Location.X + Shippic.Width)
+                        {
+                            if(pb.Location.Y > Shippic.Location.Y && pb.Location.Y < Shippic.Location.Y + Shippic.Height)
+                            {
+                                panel1.Controls.RemoveAt(i);
+                                life--;
+                                axWindowsMediaPlayer1.URL = "sounds/explode.mp3";
+                                axWindowsMediaPlayer1.Ctlcontrols.play();
+                                if (life == 0)
+                                {
+                                    timer1.Stop();
+                                    MessageBox.Show("Gameover your score is: " + score);
+                                    GOpanel.Visible = true;
+                                }
+                            }
+                        }
                     }
                 }
                 else if(panel1.Controls[i].Name == "star")
@@ -150,6 +176,22 @@ namespace SpaceWarGame
                     else
                     {
                         pb.Location = new Point(pb.Location.X - 5, pb.Location.Y);
+                    }
+                }
+                for (int x = 0; x < panel1.Controls.Count; x++)
+                {
+                    if(panel1.Controls[x].Name == "enemy")
+                    {
+                        if(pb.Location.X + pb.Width > panel1.Controls[x].Location.X && pb.Location.X + pb.Width < panel1.Controls[x].Location.X + panel1.Controls[x].Width)
+                        {
+                            if(pb.Location.Y + pb.Height > panel1.Controls[x].Location.Y && pb.Location.Y + pb.Height < panel1.Controls[x].Location.Y + panel1.Controls[x].Height)
+                            {
+                                panel1.Controls.RemoveAt(x);
+                                panel1.Controls.Remove(pb);
+                                score++;
+                                Scorelbl.Text = score.ToString();
+                            }
+                        }
                     }
                 }
             }
@@ -168,6 +210,17 @@ namespace SpaceWarGame
         private void Form1_Load(object sender, EventArgs e)
         {
             timer1.Start();
+            axWindowsMediaPlayer2.URL = "sounds/background.mp3";
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            PlayAgain();
         }
     }
 }
